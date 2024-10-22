@@ -2,7 +2,7 @@ import React from 'react';
 
 export const HeroSection = () => {
   return (
-    <section className="section pt-14">
+    <section className="section my-20 py-14">
       <div className="container mx-auto">
         <div className="flex flex-col gap-4 items-center">
           {/* Heading and Description */}
