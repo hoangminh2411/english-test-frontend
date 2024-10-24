@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Link from 'next/link';
+
 export const Exam = () => {
   // Example exam data
   const exams = [
@@ -57,6 +59,7 @@ export const Exam = () => {
           {exams.map((exam) => (
             <ExamCard
               key={exam.id}
+              id={exam.id}
               title={exam.title}
               description={exam.description}
               duration={exam.duration}
@@ -72,6 +75,7 @@ export const Exam = () => {
 };
 
 interface ExamCardProps {
+  id: number;
   title: string;
   description: string;
   duration: string;
@@ -80,7 +84,7 @@ interface ExamCardProps {
   participants: number;
 }
 
-const ExamCard: React.FC<ExamCardProps> = ({ title, description, duration, skills, questions, participants }) => {
+const ExamCard: React.FC<ExamCardProps> = ({ id, title, description, duration, skills, questions, participants }) => {
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
       <div className="flex items-center justify-between mb-4">
@@ -155,7 +159,9 @@ const ExamCard: React.FC<ExamCardProps> = ({ title, description, duration, skill
       </div>
       {/* Start button */}
       <div className="mt-4 flex justify-between items-center">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">Join Exam</button>
+        <Link href={`/exam/${id}`} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+          Join Exam
+        </Link>
       </div>
     </div>
   );
