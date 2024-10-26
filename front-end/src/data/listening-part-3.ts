@@ -1,0 +1,77 @@
+export const LISTENING_PART_3 = [
+  {
+    id: 65,
+    examId: 1,
+    parentId: null,
+    content: `   <h2>PART 3: Questions 21-35</h2>
+    <p><strong>Directions:</strong> In this part, you will hear THREE talks, lectures or conversations. The talks, lectures, or conversations will not be repeated. There are five questions for each talk, lecture, or conversation. For each question, choose the right answer A, B, C or D.</p>`,
+    document: {
+      type: 'AUDIO',
+      url: 'https://firebasestorage.googleapis.com/v0/b/english-test-ddf9d.appspot.com/o/T1-PART3.mp3?alt=media&token=41ede056-810d-420c-8409-76f8d4517808',
+      metadata: {}
+    },
+    type: 'LISTENING',
+    order: 3,
+    answers: [],
+    createdBy: { id: 1, name: 'Admin' },
+    updatedBy: { id: 1, name: 'Admin' },
+    updatedAt: '2024-01-01T00:00:00Z',
+    createdAt: '2024-01-01T00:00:00Z'
+  },
+
+  ...Array.from({ length: 15 }, (_, i) => ({
+    id: i + 66,
+    examId: 1,
+    parentId: 65,
+    content: `Question content for Reading Part 1 - Question ${i+ 66}`,
+    document: null,
+    type: 'LISTENING',
+    order: i+ 21,
+    answers: [
+      {
+        id: i * 4 + 1,
+        questionId: i+ 66,
+        isCorrect: i % 2 === 0,
+        content: 'Answer A',
+        order: 1,
+        updatedBy: { id: 1, name: 'Admin' },
+        updatedAt: '2024-01-01T00:00:00Z',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      {
+        id: i * 4 + 2,
+        questionId: i+ 66,
+        isCorrect: i % 2 !== 0,
+        content: 'Answer B',
+        order: 2,
+        updatedBy: { id: 1, name: 'Admin' },
+        updatedAt: '2024-01-01T00:00:00Z',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      {
+        id: i * 4 + 3,
+        questionId:  i+ 66,
+        isCorrect: false,
+        content: 'Answer C',
+        order: 3,
+        updatedBy: { id: 1, name: 'Admin' },
+        updatedAt: '2024-01-01T00:00:00Z',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      {
+        id: i * 4 + 4,
+        questionId:  i+ 66,
+        isCorrect: false,
+        content: 'Answer D',
+        order: 4,
+        updatedBy: { id: 1, name: 'Admin' },
+        updatedAt: '2024-01-01T00:00:00Z',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+    ],
+    createdBy: { id: 1, name: 'Admin' },
+    updatedBy: { id: 1, name: 'Admin' },
+    updatedAt: '2024-01-01T00:00:00Z',
+    createdAt: '2024-01-01T00:00:00Z',
+  })),
+]

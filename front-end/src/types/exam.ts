@@ -1,6 +1,6 @@
 import { IdName } from './common';
 
-type QuestionType = 'SPEAKING' | 'LISTENING' | 'READING' | 'WRITING';
+export type QuestionType = 'SPEAKING' | 'LISTENING' | 'READING' | 'WRITING';
 
 type DocumentType = 'IMAGE' | 'AUDIO'; // Định nghĩa loại tài liệu
 
@@ -10,7 +10,7 @@ type Document = {
   metadata?: { [key: string]: any }; // Metadata tùy chọn (ví dụ: độ dài audio, kích thước ảnh, v.v.)
 };
 
-type Answer = {
+export type IAnswer = {
   id: number;
   questionId: number;
   isCorrect?: boolean;
@@ -21,7 +21,7 @@ type Answer = {
   createdAt: string;
 };
 
-type Question = {
+export type IQuestion = {
   id: number;
   examId: number;
   parentId?: number; //questionId
@@ -30,7 +30,7 @@ type Question = {
   type: QuestionType;
   order: number;
 
-  answers?: Answer[]; //for multilchoice question
+  answers?: IAnswer[]; //for multilchoice question
 
   createdBy: IdName;
   updatedBy: IdName;
@@ -44,7 +44,7 @@ export type IExam = {
   note: string;
   totalTime: number; // seconds
 
-  questions: Question[];
+  questions: IQuestion[];
 
   totalExamies: number;
   totalQuestions: number;
