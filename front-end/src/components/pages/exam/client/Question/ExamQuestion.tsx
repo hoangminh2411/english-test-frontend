@@ -5,7 +5,7 @@ import RawHTML from '@components/common/RawHtml';
 import { useExamProvider } from '@components/providers/ExamProvider';
 import { IQuestion } from 'types/exam';
 
-import ExamAnswer from './ExamAnswer';
+import ExamAnswer from '../Answer/ExamAnswer';
 
 type ExamQuestionProps = {
   question: IQuestion;

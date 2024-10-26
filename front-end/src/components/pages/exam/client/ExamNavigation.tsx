@@ -6,26 +6,31 @@ import Timer from '@components/common/Timmer';
 import { useExamProvider } from '@components/providers/ExamProvider';
 
 export const ExamNavigation = () => {
-  const { data, onDispatchAction, type, answerStore } = useExamProvider();
+  const { data, onDispatchAction, type, answerStore, isReview } = useExamProvider();
 
   return (
     <div className="shadow p-4 rounded-md bg-white">
       <div className="flex flex-col gap-4">
         {/* TImmer */}
-        <div>
-          <p>Remaining Time</p>
-          <Timer key={type} start={true} totalTime={data.totalTime} />
-        </div>
-        <Button
-          variant="outline"
-          onClick={() =>
-            onDispatchAction({
-              type: 'MOVE_TO_NEXT_EXAM'
-            })
-          }
-        >
-          Submit Your Test
-        </Button>
+
+        {!isReview && (
+          <>
+            <div>
+              <p>Remaining Time</p>
+              <Timer key={type} start={true} totalTime={data.totalTime} />
+            </div>
+            <Button
+              variant="outline"
+              onClick={() =>
+                onDispatchAction({
+                  type: 'MOVE_TO_NEXT_EXAM'
+                })
+              }
+            >
+              Submit Your Test
+            </Button>
+          </>
+        )}
 
         {/* Skills Navigation */}
         {data.questions.map((question) => {

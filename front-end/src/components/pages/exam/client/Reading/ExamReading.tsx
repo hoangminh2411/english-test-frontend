@@ -7,7 +7,7 @@ import RawHTML from '@components/common/RawHtml';
 import { useExamProvider } from '@components/providers/ExamProvider';
 import { IQuestion } from 'types/exam';
 
-import ExamQuestion from '../ExamQuestion';
+import ExamQuestion from '../Question/ExamQuestion';
 
 export const ExamReading = () => {
   const { data, selectedQuestion } = useExamProvider();

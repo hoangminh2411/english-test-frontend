@@ -10,7 +10,8 @@ type ActionType =
   | { type: 'MOVE_TO_NEXT_EXAM' }
   | { type: 'SELECT_ANSWER'; payload: { questionId: number; answer: any } }
   | { type: 'NAVIGATE_TO_QUESTION'; payload?: SelectedQuestion }
-  | { type: 'RESET_SELECTED_QUESTION' };
+  | { type: 'RESET_SELECTED_QUESTION' }
+  | { type: 'SELECT_REVIEW_SKILL'; payload?: QuestionType };
 type SelectedQuestion = {
   partId: number;
   questionId: number;
@@ -20,6 +21,7 @@ type SelectedQuestion = {
 type ExamContextType = {
   data: IExam;
   type: QuestionType;
+  isReview?: boolean;
   answerStore: Record<number, any>;
   onDispatchAction: (action: ActionType) => void;
   selectedQuestion?: SelectedQuestion;
@@ -29,6 +31,7 @@ const examContext = createContext<ExamContextType | undefined>(undefined);
 
 interface ExamProviderProps {
   children: ReactNode;
+  answerData?: Record<number, any>;
   data: IExam;
 }
 
@@ -57,6 +60,11 @@ const examReducer = (state: any, action: ActionType) => {
         ...state,
         selectedQuestion: undefined
       };
+    case 'SELECT_REVIEW_SKILL':
+      return {
+        ...state,
+        examType: action.payload
+      };
     default:
       return state;
   }
@@ -77,18 +85,20 @@ const getNextExamType = (currentType: QuestionType): QuestionType => {
   }
 };
 
-export default function ExamProvider({ children, data }: ExamProviderProps) {
+export default function ExamProvider({ children, data, answerData }: ExamProviderProps) {
   const router = useRouter();
   const [state, dispatch] = useReducer(examReducer, {
     examType: 'READING',
-    answerStore: {},
+    answerStore: answerData ?? {},
     selectedQuestion: undefined
   });
 
   const onSubmitExam = useCallback(() => {
     alert('Bạn đã hoàn tất bài thi');
-    router.push('/');
-  }, [router]);
+
+    console.log('Your Answer', state.answerStore);
+    router.push(`/score/${data.id}`);
+  }, [router, state, data]);
 
   const onDispatchAction = useCallback(
     (action: ActionType) => {
@@ -104,12 +114,13 @@ export default function ExamProvider({ children, data }: ExamProviderProps) {
   const contextValue = useMemo(
     () => ({
       data,
+      isReview: !!answerData,
       type: state.examType,
       answerStore: state.answerStore,
       selectedQuestion: state.selectedQuestion,
       onDispatchAction
     }),
-    [data, state.examType, state.answerStore, state.selectedQuestion, onDispatchAction]
+    [data, answerData, state.examType, state.answerStore, state.selectedQuestion, onDispatchAction]
   );
 
   return <examContext.Provider value={contextValue}>{children}</examContext.Provider>;
