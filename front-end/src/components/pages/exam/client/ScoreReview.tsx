@@ -1,9 +1,10 @@
 'use client';
-import { useExamProvider } from '@components/providers/ExamProvider';
-import { QuestionType } from 'types/exam';
 import React from 'react';
 
-export const ScoreReview = () => {
+import { useExamProvider } from '@components/providers/ExamProvider';
+import { QuestionType } from 'types/exam';
+
+export const ScoreReview = ({ score }: { score: Record<'listening' | 'reading' | 'speaking' | 'writing', number> }) => {
   const { onDispatchAction } = useExamProvider();
   const scoreSkills = [
     {
@@ -19,7 +20,7 @@ export const ScoreReview = () => {
           />
         </svg>
       ),
-      score: 9
+      score: score.reading
     },
     {
       title: 'LISTENING',
@@ -32,7 +33,7 @@ export const ScoreReview = () => {
           />
         </svg>
       ),
-      score: 9
+      score: score.listening
     },
     {
       title: 'WRITING',
@@ -44,7 +45,7 @@ export const ScoreReview = () => {
           />
         </svg>
       ),
-      score: 9
+      score: score.writing
     },
     {
       title: 'SPEAKING',
@@ -90,7 +91,7 @@ export const ScoreReview = () => {
           />
         </svg>
       ),
-      score: 9
+      score: score.speaking
     }
   ];
 

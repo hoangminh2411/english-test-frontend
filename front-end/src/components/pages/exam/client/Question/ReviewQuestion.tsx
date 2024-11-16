@@ -9,13 +9,14 @@ import ReviewAnswer from '../Answer/ReviewAnswer';
 
 type ReviewQuestionProps = {
   question: IQuestion;
+  questionNumber:number
 };
 
-const ReviewQuestion: React.FC<ReviewQuestionProps> = ({ question }) => {
+const ReviewQuestion: React.FC<ReviewQuestionProps> = ({ question, questionNumber=0 }) => {
   const { answerStore, onDispatchAction, selectedQuestion } = useExamProvider();
   const questionRef = useRef<HTMLDivElement>(null);
 
-  const selectedAnswerId = answerStore[question.id];
+  const selectedAnswerContent = answerStore[question.id];
   const selectedQuestionId = selectedQuestion?.questionId;
 
   useEffect(() => {
@@ -25,7 +26,9 @@ const ReviewQuestion: React.FC<ReviewQuestionProps> = ({ question }) => {
     }
   }, [selectedQuestionId, question.id]);
 
-  console.log('selectedAnswerId', selectedAnswerId, selectedQuestionId);
+
+  //debug
+  console.log("QUESTION DATA", question.content,selectedAnswerContent )
   return (
     <div ref={questionRef} className="flex flex-row gap-2 p-2" data-qid={question.id} id={`question-wrapper-${question.id}`}>
       <div
@@ -33,7 +36,7 @@ const ReviewQuestion: React.FC<ReviewQuestionProps> = ({ question }) => {
         data-qid={question.id}
         data-markable="true"
       >
-        <strong>{question.order}</strong>
+        <strong>{questionNumber}</strong>
       </div>
 
       <div className="text-gray-800 mb-4">
@@ -43,7 +46,7 @@ const ReviewQuestion: React.FC<ReviewQuestionProps> = ({ question }) => {
 
         <div className="flex flex-col gap-2">
           {question.answers?.map((answer, index: number) => (
-            <ReviewAnswer key={index} answer={answer} questionId={question.id} selectedAnswerId={selectedAnswerId} />
+            <ReviewAnswer key={index} answer={answer} questionId={question.id} selectedAnswerContent={selectedAnswerContent} />
           ))}
         </div>
       </div>

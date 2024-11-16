@@ -1,14 +1,11 @@
 'use client';
 import React, { useState, useCallback } from 'react';
-
-import AudioRecorder from '@components/common/AudioRecord';
 import Chip from '@components/common/Chip';
 import RawHTML from '@components/common/RawHtml';
 import { useExamProvider } from '@components/providers/ExamProvider';
-import { FirebaseService } from '@utils/api/file';
 import { IQuestion } from 'types/exam';
 
-export const ExamSpeaking = () => {
+export const ReviewSpeaking = () => {
   const { data } = useExamProvider();
   const allSpeakingParts = data?.questions?.filter((val) => val.type === 'SPEAKING' && !val.parentId) || [];
   const [activePart, setActivePart] = useState<number>(allSpeakingParts?.[0]?.id ?? '');
@@ -43,60 +40,48 @@ type SpeakingPartProps = {
 };
 
 const SpeakingPart = ({ data }: SpeakingPartProps) => {
-  const { answerStore, onDispatchAction } = useExamProvider();
+  const { scoreData = {} } = useExamProvider();
 
-  const addAudioElement = useCallback(
-    async (blob: Blob) => {
-      try {
-        const filePath = `speaking_answers/${data.id}-${Date.now()}.webm`; // Unique file path
-        const url = await FirebaseService.uploadFile(blob, filePath, (progress) => {
-          console.log(`Upload progress: ${progress}%`);
-        });
-        onDispatchAction({
-          type: 'SELECT_ANSWER',
-          payload: {
-            questionId: data.id,
-            answer: url
-          }
-        });
-      } catch (error) {
-        console.error('Failed to upload audio:', error);
-      }
-    },
-    [data?.id, onDispatchAction]
-  );
-
-  const audio = answerStore[data.id];
+  // Retrieve audio answer, score, and feedback for the question
+  const audio = scoreData[data.id]?.selectedAnswer ?? "";
+  const score = scoreData[data.id]?.score ?? 0;
+  const feedback = scoreData[data.id]?.feedback ?? "";
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 pt-0">
-      {/* Nội dung câu hỏi */}
+      {/* Question Content */}
       <div className="p-4 bg-neutral-50 overflow-y-auto max-h-[calc(100vh-350px)] border border-gray-200 rounded-md">
         <RawHTML>{data.content}</RawHTML>
       </div>
 
-      {/* Phần ghi âm */}
-      <div className="flex flex-col justify-center items-center gap-4 h-full overflow-y-auto max-h-[calc(100vh-350px)] border border-gray-200 rounded-md p-4 bg-blue-50/30">
+      {/* Audio Answer and Review Section */}
+      <div className="flex flex-col gap-4 h-full overflow-y-auto max-h-[calc(100vh-350px)] border border-gray-200 rounded-md p-4 bg-blue-50/30">
+        {/* Audio Player */}
+        <p>Your Answer</p>
         {audio ? (
           <audio className="w-full" controls>
             <source src={audio} type="audio/mpeg" />
             Your browser does not support the audio element.
           </audio>
         ) : (
-          <div className="flex flex-col items-center">
-            <div className="text-center mb-4 text-lg font-bold text-blue-600">Click to Record</div>
-            <AudioRecorder
-              onRecordingComplete={addAudioElement}
-              audioTrackConstraints={{
-                noiseSuppression: true,
-                echoCancellation: true
-              }}
-              downloadOnSavePress={false}
-              downloadFileExtension="webm"
-            />
-            <span className="text-gray-500 mt-2 text-sm">Press the microphone icon to start recording</span>
-          </div>
+          <p className="text-gray-500">No audio answer provided.</p>
         )}
+
+        {/* Score Section */}
+        <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <h3 className="font-bold text-gray-700">Score</h3>
+          <p className="text-xl font-semibold text-green-700">{score} / 9.0</p>
+        </div>
+
+        {/* Feedback Section */}
+        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h3 className="font-bold text-gray-700">Feedback</h3>
+          {feedback ? (
+            <p className="text-gray-800">{feedback}</p>
+          ) : (
+            <p className="text-gray-500">No feedback provided.</p>
+          )}
+        </div>
       </div>
     </div>
   );

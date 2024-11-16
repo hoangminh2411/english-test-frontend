@@ -55,3 +55,35 @@ export type IExam = {
   updatedAt: string;
   createdAt: string;
 };
+
+// Score type for each skill
+export interface IScore {
+  skill: QuestionType;
+  score: number;
+  comments?: string; // Optional comments or feedback
+}
+
+// User Answer with additional details for review purposes
+export interface IUserAnswer {
+  questionId: number;
+  selectedAnswer: string; // The answer submitted by the user
+  isCorrect?: boolean; // Indicates correctness for review purposes
+  correctAnswer?: string; // For displaying the correct answer (if available)
+  feedback?: string; // Optional feedback for the user's answer
+}
+
+// Exam result, now including completed questions and user's answers
+export interface IExamResult {
+  id: number;
+  examId: number;
+  userId: number;
+  scores: IScore[]; // Array of scores for each skill
+  reviewedBy?: IdName; // Reviewer (e.g., ChatGPT for Speaking/Writing)
+  review?: string; // General review comments for speaking/writing sections
+  completedQuestions: {
+    question: IQuestion; // Original question details
+    userAnswer: IUserAnswer; // User's submitted answer
+  }[]; // Array of questions with user answers for review
+  createdAt: string;
+  updatedAt: string;
+}

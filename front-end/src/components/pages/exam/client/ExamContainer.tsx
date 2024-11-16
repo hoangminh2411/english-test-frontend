@@ -10,10 +10,11 @@ import { ExamStepper } from './ExamStepper';
 
 type Props = {
   data: IExam;
+  attemptId:number
 };
-export const ExamContainer = ({ data }: Props) => {
+export const ExamContainer = ({attemptId, data }: Props) => {
   return (
-    <ExamProvider data={data}>
+    <ExamProvider attemptId={attemptId}  data={data}>
       <div className="p-4 bg-gray-100">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col items-center w-full container mx-auto gap-4">

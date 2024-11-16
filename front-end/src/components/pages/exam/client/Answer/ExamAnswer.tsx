@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 
 import { IAnswer } from 'types/exam';
@@ -5,11 +6,11 @@ import { IAnswer } from 'types/exam';
 type AnswerProps = {
   answer: IAnswer;
   questionId: number;
-  onSelect: (answerId: number) => void;
-  selectedAnswerId?: number;
+  onSelect: (answerContent: string) => void;
+  selectedAnswerContent?: string;
 };
 
-const ExamAnswer: React.FC<AnswerProps> = ({ answer, questionId, onSelect, selectedAnswerId }) => {
+const ExamAnswer: React.FC<AnswerProps> = ({ answer, questionId, onSelect, selectedAnswerContent }) => {
   return (
     <div className="form-check flex items-center mb-2">
       <input
@@ -20,8 +21,8 @@ const ExamAnswer: React.FC<AnswerProps> = ({ answer, questionId, onSelect, selec
         name={`question-${questionId}`}
         id={`question-${questionId}-${answer.id}`}
         value={answer.content}
-        checked={selectedAnswerId === answer.id}
-        onChange={() => onSelect(answer.id)}
+        checked={selectedAnswerContent === answer.content}
+        onChange={() => onSelect(answer.content)}
       />
       <label className="form-check-label text-gray-700" htmlFor={`question-${questionId}-${answer.id}`}>
         {answer.content}

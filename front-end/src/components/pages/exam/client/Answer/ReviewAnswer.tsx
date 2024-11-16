@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 
 import { IconCheck } from 'assets/img/icons/CheckIcon';
@@ -7,11 +8,12 @@ import { IAnswer } from 'types/exam';
 type ReviewAnswerProps = {
   answer: IAnswer;
   questionId: number;
-  selectedAnswerId?: number;
+  selectedAnswerContent?: string;
 };
 
-const ReviewAnswer: React.FC<ReviewAnswerProps> = ({ answer, questionId, selectedAnswerId }) => {
-  const isSelected = selectedAnswerId === answer.id;
+const ReviewAnswer: React.FC<ReviewAnswerProps> = ({ answer, questionId, selectedAnswerContent }) => {
+  const isSelected = selectedAnswerContent === answer.content;
+
   return (
     <div className="form-check flex items-center mb-2">
       <input

@@ -28,9 +28,9 @@ export const ExamWriting = () => {
         })}
       </div>
 
-      {allWringParts.map((part) => {
+      {allWringParts.map((part, index: number) => {
         if (part.id !== activePart) return;
-        return <WritingPart data={part} key={part.id} />;
+        return <WritingPart questionNumber={index + 1} data={part} key={part.id} />;
       })}
     </div>
   );
@@ -38,8 +38,9 @@ export const ExamWriting = () => {
 
 type WritingPartProps = {
   data: IQuestion;
+  questionNumber: number;
 };
-const WritingPart = ({ data }: WritingPartProps) => {
+const WritingPart = ({ data, questionNumber }: WritingPartProps) => {
   const { answerStore, onDispatchAction } = useExamProvider();
   const [wordCount, setWordCount] = useState(0);
 
@@ -72,7 +73,7 @@ const WritingPart = ({ data }: WritingPartProps) => {
               data-qid={data.id}
               data-markable="true"
             >
-              <strong>{data.order}</strong>
+              <strong>{questionNumber}</strong>
             </div>
             <label htmlFor="message" className="block mb-2 font-bold  text-gray-900 ">
               Write Essay Here

@@ -1,15 +1,12 @@
 'use client';
-import React, { useState, useEffect, ReactElement, Suspense } from "react";
+import React, { useState, useEffect, ReactElement, Suspense } from 'react';
 
-
-
-
-import "./styles/audio-recorder.css";
-import { Props } from "types/audio";
-import useAudioRecorder from "@hooks/useAudioRecorder";
+import './styles/audio-recorder.css';
+import useAudioRecorder from '@hooks/useAudioRecorder';
+import { Props } from 'types/audio';
 
 const LiveAudioVisualizer = React.lazy(async () => {
-  const { LiveAudioVisualizer } = await import("react-audio-visualize");
+  const { LiveAudioVisualizer } = await import('react-audio-visualize');
   return { default: LiveAudioVisualizer };
 });
 
@@ -33,79 +30,56 @@ const AudioRecorder: (props: Props) => ReactElement = ({
   recorderControls,
   audioTrackConstraints,
   downloadOnSavePress = false,
-  downloadFileExtension = "webm",
+  downloadFileExtension = 'webm',
   showVisualizer = false,
   mediaRecorderOptions,
-  classes,
+  classes
 }: Props) => {
-  const {
-    startRecording,
-    stopRecording,
-    togglePauseResume,
-    recordingBlob,
-    isRecording,
-    isPaused,
-    recordingTime,
-    mediaRecorder,
-  } =
+  const { startRecording, stopRecording, togglePauseResume, recordingBlob, isRecording, isPaused, recordingTime, mediaRecorder } =
     recorderControls ??
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    useAudioRecorder(
-      audioTrackConstraints,
-      onNotAllowedOrFound,
-      mediaRecorderOptions
-    );
+    useAudioRecorder(audioTrackConstraints, onNotAllowedOrFound, mediaRecorderOptions);
 
   const [shouldSave, setShouldSave] = useState(false);
 
-  const stopAudioRecorder: (save?: boolean) => void = (
-    save: boolean = true
-  ) => {
+  const stopAudioRecorder: (save?: boolean) => void = (save: boolean = true) => {
     setShouldSave(save);
     stopRecording();
   };
 
-  const convertToDownloadFileExtension = async (
-    webmBlob: Blob
-  ): Promise<Blob> => {
-    const FFmpeg:any = await import("@ffmpeg/ffmpeg");
+  const convertToDownloadFileExtension = async (webmBlob: Blob): Promise<Blob> => {
+    const FFmpeg: any = await import('@ffmpeg/ffmpeg');
     const ffmpeg = FFmpeg.createFFmpeg({ log: false });
     await ffmpeg.load();
 
-    const inputName = "input.webm";
+    const inputName = 'input.webm';
     const outputName = `output.${downloadFileExtension}`;
 
-    ffmpeg.FS(
-      "writeFile",
-      inputName,
-      new Uint8Array(await webmBlob.arrayBuffer())
-    );
+    ffmpeg.FS('writeFile', inputName, new Uint8Array(await webmBlob.arrayBuffer()));
 
-    await ffmpeg.run("-i", inputName, outputName);
+    await ffmpeg.run('-i', inputName, outputName);
 
-    const outputData = ffmpeg.FS("readFile", outputName);
+    const outputData = ffmpeg.FS('readFile', outputName);
     const outputBlob = new Blob([outputData.buffer], {
-      type: `audio/${downloadFileExtension}`,
+      type: `audio/${downloadFileExtension}`
     });
 
     return outputBlob;
   };
 
   const downloadBlob = async (blob: Blob): Promise<void> => {
-    if (!crossOriginIsolated && downloadFileExtension !== "webm") {
+    if (!crossOriginIsolated && downloadFileExtension !== 'webm') {
       console.warn(
-        `This website is not "cross-origin isolated". Audio will be downloaded in webm format, since mp3/wav encoding requires cross origin isolation. Please visit https://web.dev/cross-origin-isolation-guide/ and https://web.dev/coop-coep/ for information on how to make your website "cross-origin isolated"`
+        'This website is not "cross-origin isolated". Audio will be downloaded in webm format, since mp3/wav encoding requires cross origin isolation. Please visit https://web.dev/cross-origin-isolation-guide/ and https://web.dev/coop-coep/ for information on how to make your website "cross-origin isolated"'
       );
     }
 
-    const downloadBlob = crossOriginIsolated
-      ? await convertToDownloadFileExtension(blob)
-      : blob;
-    const fileExt = crossOriginIsolated ? downloadFileExtension : "webm";
+    const downloadBlob = crossOriginIsolated ? await convertToDownloadFileExtension(blob) : blob;
+    const fileExt = crossOriginIsolated ? downloadFileExtension : 'webm';
     const url = URL.createObjectURL(downloadBlob);
 
-    const a = document.createElement("a");
-    a.style.display = "none";
+    const a = document.createElement('a');
+    a.style.display = 'none';
     a.href = url;
     a.download = `audio.${fileExt}`;
     document.body.appendChild(a);
@@ -114,11 +88,7 @@ const AudioRecorder: (props: Props) => ReactElement = ({
   };
 
   useEffect(() => {
-    if (
-      (shouldSave || recorderControls) &&
-      recordingBlob != null &&
-      onRecordingComplete != null
-    ) {
+    if ((shouldSave || recorderControls) && recordingBlob != null && onRecordingComplete != null) {
       onRecordingComplete(recordingBlob);
       if (downloadOnSavePress) {
         void downloadBlob(recordingBlob);
@@ -127,36 +97,22 @@ const AudioRecorder: (props: Props) => ReactElement = ({
   }, [recordingBlob]);
 
   return (
-    <div
-      className={`audio-recorder ${isRecording ? "recording" : ""} ${
-        classes?.AudioRecorderClass ?? ""
-      }`}
-      data-testid="audio_recorder"
-    >
+    <div className={`audio-recorder ${isRecording ? 'recording' : ''} ${classes?.AudioRecorderClass ?? ''}`} data-testid="audio_recorder">
       <img
         src={isRecording ? '/assets/icons/save.svg' : '/assets/icons/mics.svg'}
-        className={`audio-recorder-mic ${
-          classes?.AudioRecorderStartSaveClass ?? ""
-        }`}
+        className={`audio-recorder-mic ${classes?.AudioRecorderStartSaveClass ?? ''}`}
         onClick={isRecording ? () => stopAudioRecorder() : startRecording}
         data-testid="ar_mic"
-        title={isRecording ? "Save recording" : "Start recording"}
+        title={isRecording ? 'Save recording' : 'Start recording'}
       />
       <span
-        className={`audio-recorder-timer ${
-          !isRecording ? "display-none" : ""
-        } ${classes?.AudioRecorderTimerClass ?? ""}`}
+        className={`audio-recorder-timer ${!isRecording ? 'display-none' : ''} ${classes?.AudioRecorderTimerClass ?? ''}`}
         data-testid="ar_timer"
       >
-        {Math.floor(recordingTime / 60)}:
-        {String(recordingTime % 60).padStart(2, "0")}
+        {Math.floor(recordingTime / 60)}:{String(recordingTime % 60).padStart(2, '0')}
       </span>
       {showVisualizer ? (
-        <span
-          className={`audio-recorder-visualizer ${
-            !isRecording ? "display-none" : ""
-          }`}
-        >
+        <span className={`audio-recorder-visualizer ${!isRecording ? 'display-none' : ''}`}>
           {mediaRecorder && (
             <Suspense fallback={<></>}>
               <LiveAudioVisualizer
@@ -174,29 +130,21 @@ const AudioRecorder: (props: Props) => ReactElement = ({
           )}
         </span>
       ) : (
-        <span
-          className={`audio-recorder-status ${
-            !isRecording ? "display-none" : ""
-          } ${classes?.AudioRecorderStatusClass ?? ""}`}
-        >
+        <span className={`audio-recorder-status ${!isRecording ? 'display-none' : ''} ${classes?.AudioRecorderStatusClass ?? ''}`}>
           <span className="audio-recorder-status-dot"></span>
           Recording
         </span>
       )}
       <img
-        src={isPaused ? "/assets/icons/play.svg" : "/assets/icons/pause.svg"}
-        className={`audio-recorder-options ${
-          !isRecording ? "display-none" : ""
-        } ${classes?.AudioRecorderPauseResumeClass ?? ""}`}
+        src={isPaused ? '/assets/icons/play.svg' : '/assets/icons/pause.svg'}
+        className={`audio-recorder-options ${!isRecording ? 'display-none' : ''} ${classes?.AudioRecorderPauseResumeClass ?? ''}`}
         onClick={togglePauseResume}
-        title={isPaused ? "Resume recording" : "Pause recording"}
+        title={isPaused ? 'Resume recording' : 'Pause recording'}
         data-testid="ar_pause"
       />
       <img
-        src={"/assets/icons/stop.svg"}
-        className={`audio-recorder-options ${
-          !isRecording ? "display-none" : ""
-        } ${classes?.AudioRecorderDiscardClass ?? ""}`}
+        src={'/assets/icons/stop.svg'}
+        className={`audio-recorder-options ${!isRecording ? 'display-none' : ''} ${classes?.AudioRecorderDiscardClass ?? ''}`}
         onClick={() => stopAudioRecorder(false)}
         title="Discard Recording"
         data-testid="ar_cancel"

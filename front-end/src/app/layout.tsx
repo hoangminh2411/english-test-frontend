@@ -3,6 +3,7 @@ import { Heebo } from 'next/font/google';
 import ToastContainerWrapper from '@components/providers/ToastProvider';
 
 import type { Metadata } from 'next';
+
 import './globals.css';
 
 const heebo = Heebo({

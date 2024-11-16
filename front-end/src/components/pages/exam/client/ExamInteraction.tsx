@@ -8,7 +8,9 @@ import { ReviewListening } from './Listening/ReviewListening';
 import { ExamReading } from './Reading/ExamReading';
 import { ReviewReading } from './Reading/ReviewReading';
 import { ExamSpeaking } from './Speaking/ExamSpeaking';
+import { ReviewSpeaking } from './Speaking/ReviewSpeaking';
 import { ExamWriting } from './Writing/ExamWriting';
+import { ReviewWriting } from './Writing/ReviewWriting';
 
 export const ExamInteraction = () => {
   const { type, isReview } = useExamProvider();
@@ -18,8 +20,10 @@ export const ExamInteraction = () => {
       {type == 'READING' && isReview && <ReviewReading />}
       {type == 'LISTENING' && !isReview && <ExamListening />}
       {type == 'LISTENING' && isReview && <ReviewListening />}
-      {type == 'SPEAKING' && <ExamSpeaking />}
-      {type == 'WRITING' && <ExamWriting />}
+      {type == 'SPEAKING' && !isReview && <ExamSpeaking />}
+      {type == 'SPEAKING' && isReview && <ReviewSpeaking />}
+      {type == 'WRITING' && !isReview && <ExamWriting />}
+      {type == 'WRITING' && isReview && <ReviewWriting />}
     </div>
   );
 };

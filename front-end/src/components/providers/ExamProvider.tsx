@@ -1,9 +1,12 @@
 'use client';
-import { createContext, ReactNode, useContext, useReducer, useMemo, useCallback } from 'react';
+import { createContext, ReactNode, useContext, useReducer, useMemo, useCallback, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { ResultService } from '@utils/api/results';
 import { IExam, QuestionType } from 'types/exam';
+import { useAuth } from './AuthProvider';
+import LoadingWrapper from '@components/elements/LoadingWrapper';
 
 // Define action types
 type ActionType =
@@ -23,6 +26,7 @@ type ExamContextType = {
   type: QuestionType;
   isReview?: boolean;
   answerStore: Record<number, any>;
+  scoreData?: Record<number, { selectedAnswer: string; score: number; feedback: string }>;
   onDispatchAction: (action: ActionType) => void;
   selectedQuestion?: SelectedQuestion;
 };
@@ -32,7 +36,9 @@ const examContext = createContext<ExamContextType | undefined>(undefined);
 interface ExamProviderProps {
   children: ReactNode;
   answerData?: Record<number, any>;
+  scoreData?: Record<number, { selectedAnswer: string; score: number; feedback: string }>;
   data: IExam;
+  attemptId?:number
 }
 
 const examReducer = (state: any, action: ActionType) => {
@@ -73,9 +79,9 @@ const examReducer = (state: any, action: ActionType) => {
 const getNextExamType = (currentType: QuestionType): QuestionType => {
   switch (currentType) {
     case 'READING':
-      return 'LISTENING';
-    case 'LISTENING':
       return 'WRITING';
+    case 'LISTENING':
+      return 'READING';
     case 'WRITING':
       return 'SPEAKING';
     case 'SPEAKING':
@@ -85,25 +91,47 @@ const getNextExamType = (currentType: QuestionType): QuestionType => {
   }
 };
 
-export default function ExamProvider({ children, data, answerData }: ExamProviderProps) {
+export default function ExamProvider({ children, data, answerData, scoreData, attemptId }: ExamProviderProps) {
   const router = useRouter();
+  const {user} = useAuth()
+  const [isLoading, setIsLoading] = useState(false)
   const [state, dispatch] = useReducer(examReducer, {
-    examType: 'READING',
+    examType: 'LISTENING',
     answerStore: answerData ?? {},
+    scoreData: scoreData ?? {},
     selectedQuestion: undefined
   });
 
-  const onSubmitExam = useCallback(() => {
+  const onSubmitExam = useCallback(async () => {
     alert('Bạn đã hoàn tất bài thi');
+    setIsLoading(true)
+    const formExam: any = {
+      userId: user?.id,
+      examId: data.id,
+      answers: []
+    };
 
-    console.log('Your Answer', state.answerStore);
-    router.push(`/score/${data.id}`);
-  }, [router, state, data]);
+    Object.keys(state.answerStore).forEach((questionId) => {
+      formExam.answers.push({
+        questionId: Number(questionId),
+        selectedAnswer: state.answerStore[questionId]
+      });
+    });
+
+    const results = await ResultService.submitExam({
+      attemptId: attemptId,
+      submissionData: formExam
+    });
+    if (results.statusCode) {
+      router.push(`/exam-attempt/${attemptId}`);
+    }
+    // router.push(`/score/${data.id}`);
+  }, [router, state, data,attemptId,user]);
 
   const onDispatchAction = useCallback(
     (action: ActionType) => {
       if (action.type === 'MOVE_TO_NEXT_EXAM' && state.examType === 'SPEAKING') {
-        onSubmitExam();
+        void onSubmitExam();
       } else {
         dispatch(action);
       }
@@ -114,16 +142,19 @@ export default function ExamProvider({ children, data, answerData }: ExamProvide
   const contextValue = useMemo(
     () => ({
       data,
-      isReview: !!answerData,
+      isReview: !!scoreData,
       type: state.examType,
       answerStore: state.answerStore,
       selectedQuestion: state.selectedQuestion,
+      scoreData: state.scoreData,
       onDispatchAction
     }),
     [data, answerData, state.examType, state.answerStore, state.selectedQuestion, onDispatchAction]
   );
 
-  return <examContext.Provider value={contextValue}>{children}</examContext.Provider>;
+  return <examContext.Provider value={contextValue}>
+        <LoadingWrapper isLoading={isLoading}> {children}</LoadingWrapper>     
+    </examContext.Provider>;
 }
 
 export const useExamProvider = () => {

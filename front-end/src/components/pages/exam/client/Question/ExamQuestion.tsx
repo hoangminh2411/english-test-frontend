@@ -9,22 +9,23 @@ import ExamAnswer from '../Answer/ExamAnswer';
 
 type ExamQuestionProps = {
   question: IQuestion;
+  questionNumber: number;
 };
 
-const ExamQuestion: React.FC<ExamQuestionProps> = ({ question }) => {
+const ExamQuestion: React.FC<ExamQuestionProps> = ({ question, questionNumber }) => {
   const { answerStore, onDispatchAction, selectedQuestion } = useExamProvider();
   const questionRef = useRef<HTMLDivElement>(null);
 
-  const handleAnswerSelect = (answerId: number) => {
+  const handleAnswerSelect = (answerContent: string) => {
     onDispatchAction({
       type: 'SELECT_ANSWER',
       payload: {
         questionId: question.id,
-        answer: answerId
+        answer: answerContent
       }
     });
   };
-  const selectedAnswerId = answerStore[question.id];
+  const selectedAnswerContent = answerStore[question.id];
   const selectedQuestionId = selectedQuestion?.questionId;
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const ExamQuestion: React.FC<ExamQuestionProps> = ({ question }) => {
         data-qid={question.id}
         data-markable="true"
       >
-        <strong>{question.order}</strong>
+        <strong>{questionNumber || 0}</strong>
       </div>
 
       <div className="text-gray-800 mb-4">
@@ -55,7 +56,7 @@ const ExamQuestion: React.FC<ExamQuestionProps> = ({ question }) => {
               key={answer.id}
               answer={answer}
               questionId={question.id}
-              selectedAnswerId={selectedAnswerId}
+              selectedAnswerContent={selectedAnswerContent}
               onSelect={handleAnswerSelect}
             />
           ))}

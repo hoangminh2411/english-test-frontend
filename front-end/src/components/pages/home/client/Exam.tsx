@@ -1,75 +1,73 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
+import { ExamService } from '@utils/api/exam';
+import { FetchError } from '@utils/api';
+import LoadingWrapper from '@components/elements/LoadingWrapper';
+import { formatDuration } from '@utils/helper';
+import { useRouter } from 'next/navigation';
 export const Exam = () => {
-  // Example exam data
-  const exams = [
-    {
-      id: 1,
-      title: 'English Test 1',
-      description: 'Improve your listening skills with this test.',
-      duration: '45 minutes',
-      skills: 4,
-      questions: 10,
-      participants: 150
-    },
-    {
-      id: 2,
-      title: 'English Test 2',
-      description: 'Practice speaking with real-world topics.',
-      duration: '30 minutes',
-      skills: 4,
-      questions: 5,
-      participants: 120
-    },
-    {
-      id: 3,
-      title: 'English Test 3',
-      description: 'Test your reading comprehension with various texts.',
-      duration: '60 minutes',
-      skills: 4,
-      questions: 15,
-      participants: 170
-    },
-    {
-      id: 4,
-      title: 'English Test 4',
-      description: 'Evaluate your writing with detailed topics.',
-      duration: '90 minutes',
-      skills: 4,
-      questions: 20,
-      participants: 200
-    }
-  ];
+  const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [exams, setExams] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchExams = async () => {
+      try {
+        const response = await ExamService.getList();
+        if (response && response.data) {
+          setExams(response.data)
+        } 
+        setIsFetching(false)
+      } catch (error: any) {
+        setIsFetching(false);
+        if (error instanceof FetchError) {
+          const errorMessage = error.responseBody?.error?.error || error.responseBody?.message || 'An unexpected error occurred';
+          // Display error message in the UI
+          setIsFetching(false);
+        } else {
+          console.error('Unexpected error:', error);
+          setIsFetching(false);
+        }
+      }
+    };
+
+    fetchExams()
+  }, []);
+
 
   return (
-    <section className="section my-20 py-14 bg-[#F9F9F9]">
+    <section>
+      <LoadingWrapper isLoading={isFetching}>
       <div className="container mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Available English B2 Exams</h1>
-          <p className="text-lg text-gray-600">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-3">Available English B2 Exams</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
             Prepare for your B2 exams by taking practice tests for listening, speaking, reading, and writing.
           </p>
         </div>
 
         {/* Exam Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {exams.map((exam) => (
+          {exams.map((exam: any) => (
             <ExamCard
               key={exam.id}
               id={exam.id}
+              description={exam.note}
               title={exam.title}
-              description={exam.description}
-              duration={exam.duration}
-              skills={exam.skills}
-              questions={exam.questions}
-              participants={exam.participants}
+              duration={exam.totalTime}
+              skills={exam.totalSkills}
+              questions={exam.totalQuestions}
+              participants={exam.totalExamies}
             />
           ))}
         </div>
       </div>
+      </LoadingWrapper>
+  
     </section>
   );
 };
@@ -78,7 +76,7 @@ interface ExamCardProps {
   id: number;
   title: string;
   description: string;
-  duration: string;
+  duration: number;
   skills: number;
   questions: number;
   participants: number;
@@ -86,11 +84,11 @@ interface ExamCardProps {
 
 const ExamCard: React.FC<ExamCardProps> = ({ id, title, description, duration, skills, questions, participants }) => {
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition">
       <div className="flex items-center justify-between mb-4">
         {/* Skills badge */}
         <div className="flex items-center space-x-2">
-          <div className="bg-gray-100 rounded-full p-2">
+          <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-2">
             <svg
               fill="currentColor"
               className="w-4 h-4"
@@ -105,10 +103,10 @@ const ExamCard: React.FC<ExamCardProps> = ({ id, title, description, duration, s
               </g>
             </svg>
           </div>
-          <span className="text-gray-600">{skills} skills</span>
+          <span className="text-gray-600 dark:text-gray-300 text-sm">{skills} skills</span>
         </div>
         {/* Number of participants */}
-        <div className="text-sm text-gray-500 flex gap-2">
+        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
           <svg fill="currentColor" className="w-4 h-4" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -121,12 +119,12 @@ const ExamCard: React.FC<ExamCardProps> = ({ id, title, description, duration, s
         </div>
       </div>
       {/* Exam title */}
-      <h2 className="text-lg font-semibold mb-2">{title}</h2>
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">{title}</h2>
       {/* Exam details */}
-      <div className="text-gray-600 mb-4">
+      <div className="text-gray-600 dark:text-gray-400 mb-4">
         <p>{description}</p>
       </div>
-      <div className="text-gray-600">
+      <div className="text-gray-500 dark:text-gray-300">
         <div className="flex items-center space-x-2">
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -142,7 +140,7 @@ const ExamCard: React.FC<ExamCardProps> = ({ id, title, description, duration, s
               ></path>{' '}
             </g>
           </svg>
-          <span>{duration}</span>
+          <span>{formatDuration(duration)}</span>
         </div>
         <div className="flex items-center space-x-2 mt-2">
           <svg fill="currentColor" className="w-4 h-4" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -159,7 +157,10 @@ const ExamCard: React.FC<ExamCardProps> = ({ id, title, description, duration, s
       </div>
       {/* Start button */}
       <div className="mt-4 flex justify-between items-center">
-        <Link href={`/exam/${id}`} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+        <Link
+          href={`/exam/${id}`}
+          className="block bg-blue-500 dark:bg-blue-600 text-white text-center py-2 px-4 mt-4 rounded-md hover:bg-blue-600 dark:hover:bg-blue-700 transition"
+        >
           Join Exam
         </Link>
       </div>
